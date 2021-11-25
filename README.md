@@ -1,4 +1,4 @@
-# 配置Linux网桥
+# 配置 Linux 网桥
 本文仅使用 [iproute2](http://www.policyrouting.org/iproute2.doc.html) 工具包
 ### 创建网桥
 1. 创建一个网桥并设置其状态为已启动：
@@ -33,8 +33,8 @@
 ```
 # ip link delete <bridge_name> type bridge
 ```
-### 创建虚拟tap接口并桥接到网桥
-1. 创建一个tap接口：
+### 创建虚拟 tap 接口并桥接到网桥
+1. 创建一个 tap 接口：
 ```
 # ip tap add name <ifname> mode tap
 ```
@@ -51,7 +51,7 @@
 ```
 # bridge link show
 ```
-5. 默认tap接口速率为 100Mbps，改为 1Gbps：
+5. 默认 tap 接口速率为 100Mbps，改为 1Gbps：
 ```
 # bridge link set dev <ifname> cost 4
 ```
@@ -60,5 +60,17 @@
 ```
 # ip route add default via <gateway> dev <bridge_name>
 ```
-### 参考文档
+### 以 QEMU 为例配置虚拟机桥接物理网络
+```
+qemu-system-x86_64 -nic tap,id=nd0,ifname=<ifname>,model=virtio,script=no,downscript=no \
+                   -enable-kvm \
+                   -cpu host -smp 2 \
+                   -m 512 \
+                   -drive file=<file>,format=<format>
+```
 
+### 参考文档
+[Network_bridge_(简体中文)](https://wiki.archlinux.org/title/Network_bridge_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
+[Network_configuration#Routing_table](https://wiki.archlinux.org/title/Network_configuration#Routing_table)  
+[qemu.1](https://man.archlinux.org/man/qemu.1)  
+[iproute2](http://www.policyrouting.org/iproute2.doc.html)
