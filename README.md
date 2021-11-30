@@ -6,7 +6,7 @@
 # ip link add name <bridge_name> type bridge
 # ip link set dev <bridge_name> up
 ```
-2. 给网桥配置 IP 地址：
+2. 给网桥配置 IP 地址(网桥可以配置多个 IP 地址，桥接不同的网段)：
 ```
 # ip addr add dev <bridge_name> <address>
 ```
@@ -60,6 +60,10 @@
 ```
 # ip route add default via <gateway> dev <bridge_name>
 ```
+2. 如果桥接了不同的网段也需要配置相应的路由
+```
+#  ip route add <CIDR> via <gateway> dev <bridge_name>
+```
 ### 以 QEMU 为例配置虚拟机桥接物理网络
 ```
 qemu-system-x86_64 -nic tap,id=nd0,ifname=<ifname>,model=virtio,script=no,downscript=no \
@@ -70,7 +74,7 @@ qemu-system-x86_64 -nic tap,id=nd0,ifname=<ifname>,model=virtio,script=no,downsc
 ```
 
 ### 参考文档
-[Network_bridge_(简体中文)](https://wiki.archlinux.org/title/Network_bridge_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
-[Network_configuration#Routing_table](https://wiki.archlinux.org/title/Network_configuration#Routing_table)  
-[qemu.1](https://man.archlinux.org/man/qemu.1)  
-[iproute2](http://www.policyrouting.org/iproute2.doc.html)
++ [Network_bridge_(简体中文)](https://wiki.archlinux.org/title/Network_bridge_(%E7%AE%80%E4%BD%93%E4%B8%AD%E6%96%87))  
++ [Network_configuration#Routing_table](https://wiki.archlinux.org/title/Network_configuration#Routing_table)  
++ [qemu.1](https://man.archlinux.org/man/qemu.1)  
++ [iproute2](http://www.policyrouting.org/iproute2.doc.html)
