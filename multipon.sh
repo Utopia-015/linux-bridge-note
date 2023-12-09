@@ -10,25 +10,33 @@ for i in $all_ppps; do
     flag=1
     while [ $flag -eq 1 ]; do
         if [[ ${a_ppps} =~ "${i}" ]]; then
-            flag=0
-            echo "$i dailed successfully."
-            tabid="1${i//ppp/}"
+            echo "${i}: Connection created."
             ipaddr=$(ip a show ${i} | sed -nE '/inet[^6]/p' | awk '{print $2}')
-            ip rule | grep ${ipaddr} > /dev/null
-            [ $? -eq 0 ] &&
-                echo "ip rule already added." ||
+            [ -z "$ipaddr" ] && {
+                echo "Waiting for network..."
+                sleep 3 
+                continue 
+                } || flag=0
+            tabid="1${i//ppp/}"
+            ip rule | grep ${ipaddr} > /dev/null &&
+                echo "Route rule already added." || {
+                echo "Adding route rule..."
                 ip rule add from ${ipaddr} table ${tabid}
-            ip route | grep default | grep $i > /dev/null
-            [ $? -eq 0 ] &&
-                echo "default route already added." ||
+                }
+            ip route | grep default | grep $i > /dev/null &&
+                echo "Default route already added." || {
+                echo "Adding default route..."
                 ip route add default dev $i metric ${tabid}
+                }
             [ -n "$(ip route show table ${tabid})" ] &&
-                echo "route table already added." ||
+                echo "Route table already added." || {
+                echo "Adding route table..."
                 ip route add default dev $i table ${tabid}
+                }
         else
-            echo "$i does not exist. Redial now..."
+            echo "${i}: Connection not exist. Redial now..."
             /usr/sbin/pppd call $i
-            sleep 5
+            sleep 3
             a_ppps=$(ls -l /sys/class/net/ | grep ppp | awk '{print $9}')
         fi
     done
